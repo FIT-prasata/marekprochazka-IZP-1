@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void clear_string(char string[100]);
+void remove_break(char string[100]);
 int str_len(const char string[]);
 int samestr(const char first_string[], const char second_string[]);
 int *get_params(int argc, char const *argv[]);
@@ -22,15 +22,11 @@ int main(int argc, char const *argv[])
     return 0;
 }
 
-void clear_string(char string[100])
+void remove_break(char string[100])
 {
     for (int i = 0; i < 100; i++)
     {
-        if (string[i] == '\0')
-        {
-            break;
-        }
-        else
+        if (string[i] == '\n')
         {
             string[i] = '\0';
         }
@@ -186,48 +182,40 @@ int check_level4(const char string[], const int PARAM);
 
 void process_checks(const int LEVEL, const int PARAM, const int STATS)
 {
-    int character;
     char password_string[100];
-    int character_place = 0;
     int is_valid = 1;
-    while ((character = getchar()) != EOF)
+    int count = 0;
+    while (fgets(password_string, 100, stdin))
     {
-        if (character == '\n')
+        remove_break(password_string);
+        is_valid = 1;
+        if (LEVEL >= 1)
         {
-            character_place = 0;
-            is_valid = 1;
-            if (LEVEL >= 1)
+            if (check_level1(password_string) != 1)
             {
-                if (check_level1(password_string) != 1)
-                {
-                    is_valid = 0;
-                }
+                is_valid = 0;
             }
-            if (LEVEL >= 2)
+        }
+        if (LEVEL >= 2)
+        {
+            if (check_level2(password_string, PARAM) != 1)
             {
-                if (check_level2(password_string, PARAM) != 1)
-                {
-                    is_valid = 0;
-                }
+                is_valid = 0;
             }
-            if (LEVEL >= 3)
+        }
+        if (LEVEL >= 3)
+        {
+            if (check_level3(password_string, PARAM) != 1)
             {
-                if (check_level3(password_string, PARAM) != 1)
-                {
-                    is_valid = 0;
-                }
+                is_valid = 0;
             }
+        }
 
-            if (is_valid == 1)
-            {
-                printf("%s\n", password_string);
-            }
-            clear_string(password_string);
-        }
-        else
+        if (is_valid == 1)
         {
-            password_string[character_place] = character;
-            character_place++;
+            printf("%s\n", password_string);
         }
+        count++;
     }
+    printf("%d", count);
 }
