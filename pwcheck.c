@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void remove_break(char string[100]);
+void remove_break(char string[102]);
 int str_len(const char string[]);
 int str_same(const char first_string[], const char second_string[]);
 int str_isnum(const char string[]);
@@ -12,7 +12,7 @@ int check_level1(const char string[]);
 int check_level2(const char string[], const int PARAM);
 int check_level3(const char string[], const int PARAM);
 int check_level4(const char string[], const int PARAM);
-void process_checks(const int LEVEL, const int PARAM, const int STATS);
+int process_checks(const int LEVEL, const int PARAM, const int STATS);
 
 int main(int argc, char const *argv[])
 {
@@ -22,15 +22,15 @@ int main(int argc, char const *argv[])
     const int STATS = *(parametrs + 2);
     if (validate_input(LEVEL,PARAM, argc, argv) == 1)
     {
-        process_checks(LEVEL, PARAM, STATS);
-        return 0;
+        
+        return process_checks(LEVEL, PARAM, STATS);
     }
     return 1;
 }
 
-void remove_break(char string[100])
+void remove_break(char string[102])
 {
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 102; i++)
     {
         if (string[i] == '\n')
         {
@@ -265,8 +265,8 @@ int check_level3(const char string[], const int PARAM)
 }
 int check_level4(const char string[], const int PARAM)
 {
-    char substring[100] = "";
-    char comparison_string[100] = "";
+    char substring[102] = "";
+    char comparison_string[102] = "";
     int is_ok = 1;
     for (int i = 0; i < str_len(string); i++)
     {
@@ -294,13 +294,19 @@ int check_level4(const char string[], const int PARAM)
     return is_ok;
 }
 
-void process_checks(const int LEVEL, const int PARAM, const int STATS)
+int process_checks(const int LEVEL, const int PARAM, const int STATS)
 {
-    char password_string[100];
+    char password_string[102];
     int is_valid = 1;
     int count = 0;
-    while (fgets(password_string, 100, stdin))
+    int is_error = 0;
+    while (fgets(password_string, 102, stdin))
     {
+        if (password_string[str_len(password_string)-1] != '\n') {
+            fprintf(stderr, "Too big bro");
+            is_error = 1;
+            break;
+        }
         remove_break(password_string);
         is_valid = 1;
         if (LEVEL >= 1)
@@ -338,4 +344,5 @@ void process_checks(const int LEVEL, const int PARAM, const int STATS)
         }
         count++;
     }
+    return is_error;
 }
