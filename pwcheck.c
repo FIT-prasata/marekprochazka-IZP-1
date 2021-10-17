@@ -2,14 +2,15 @@
 #include <stdlib.h>
 
 void clear_string(char string[100]);
-int str_len(char string[]);
+int str_len(const char string[]);
 int samestr(const char first_string[], const char second_string[]);
 int *get_params(int argc, char const *argv[]);
-int *check_level1(const char string[]);
-int *check_level2(const char string[], const int PARAM);
-int *check_level3(const char string[], const int PARAM);
-int *check_level4(const char string[], const int PARAM);
+int check_level1(const char string[]);
+int check_level2(const char string[], const int PARAM);
+int check_level3(const char string[], const int PARAM);
+int check_level4(const char string[], const int PARAM);
 void process_checks(const int LEVEL, const int PARAM, const int STATS);
+
 int main(int argc, char const *argv[])
 {
 
@@ -17,27 +18,7 @@ int main(int argc, char const *argv[])
     const int LEVEL = *parametrs;
     const int PARAM = *(parametrs + 1);
     const int STATS = *(parametrs + 2);
-    printf("LEVEL %d \n", LEVEL);
-    printf("PARAM %d \n", PARAM);
-    printf("STATS %d \n", STATS);
-    int character;
-    char password_string[100];
-    int character_place = 0;
-    while ((character = getchar()) != EOF)
-    {
-        if (character == '\n')
-        {
-            character_place = 0;
-            printf("%s\n", password_string);
-            clear_string(password_string);
-        }
-        else
-        {
-            password_string[character_place] = character;
-            character_place++;
-        }
-    }
-
+    process_checks(LEVEL, PARAM, STATS);
     return 0;
 }
 
@@ -56,7 +37,7 @@ void clear_string(char string[100])
     }
 }
 
-int str_len(char string[])
+int str_len(const char string[])
 {
     int count = 0;
     for (int i = 0; string[i] != '\0'; i++)
@@ -114,6 +95,139 @@ int *get_params(int argc, char const *argv[])
     return output;
 }
 
+int check_level1(const char string[])
+{
+    int has_small_char = 0;
+    int has_big_char = 0;
+
+    for (int i = 0; i < str_len(string); i++)
+    {
+        if (string[i] >= 'a' && string[i] <= 'z')
+        {
+            has_small_char = 1;
+        }
+        if (string[i] >= 'A' && string[i] <= 'Z')
+        {
+            has_big_char = 1;
+        }
+        if (has_small_char && has_big_char)
+        {
+            break;
+        }
+    }
+    return has_small_char && has_big_char;
+}
+
+int check_level2(const char string[], const int PARAM)
+{
+    int has_small_char = 0;
+    int has_big_char = 0;
+    int has_number_char = 0;
+    int has_special_char = 0;
+    int count_groups = 0;
+
+    for (int i = 0; i < str_len(string); i++)
+    {
+        if (string[i] >= 'a' && string[i] <= 'z' && has_small_char == 0)
+        {
+            count_groups++;
+            has_small_char = 1;
+        }
+        if (string[i] >= 'A' && string[i] <= 'Z' && has_big_char == 0)
+        {
+            count_groups++;
+            has_big_char = 1;
+        }
+        if (string[i] >= '0' && string[i] <= '9' && has_number_char == 0)
+        {
+            count_groups++;
+            has_number_char = 1;
+        }
+        if (
+            (
+                (string[i] >= 32 && string[i] <= 57) ||
+                (string[i] >= 72 && string[i] <= 100) ||
+                (string[i] >= 91 && string[i] <= 96) ||
+                (string[i] >= 123 && string[i] <= 126)) &&
+            has_special_char == 0)
+        {
+            count_groups++;
+            has_special_char = 1;
+        }
+    }
+    return count_groups >= PARAM ? 1 : 0;
+}
+int check_level3(const char string[], const int PARAM)
+{
+    int biggest_count = 0;
+    int sub_count = 0;
+    for (int i = 0; i < str_len(string); i++)
+    {
+        if (sub_count > biggest_count)
+        {
+            biggest_count = sub_count;
+        }
+        sub_count = 0;
+        for (int j = i; j < str_len(string); j++)
+        {
+            if (string[i] == string[j])
+            {
+                sub_count++;
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+    return biggest_count < PARAM ? 1 : 0;
+}
+int check_level4(const char string[], const int PARAM);
+
 void process_checks(const int LEVEL, const int PARAM, const int STATS)
 {
+    int character;
+    char password_string[100];
+    int character_place = 0;
+    int is_valid = 1;
+    while ((character = getchar()) != EOF)
+    {
+        if (character == '\n')
+        {
+            character_place = 0;
+            is_valid = 1;
+            if (LEVEL >= 1)
+            {
+                if (check_level1(password_string) != 1)
+                {
+                    is_valid = 0;
+                }
+            }
+            if (LEVEL >= 2)
+            {
+                if (check_level2(password_string, PARAM) != 1)
+                {
+                    is_valid = 0;
+                }
+            }
+            if (LEVEL >= 3)
+            {
+                if (check_level3(password_string, PARAM) != 1)
+                {
+                    is_valid = 0;
+                }
+            }
+
+            if (is_valid == 1)
+            {
+                printf("%s\n", password_string);
+            }
+            clear_string(password_string);
+        }
+        else
+        {
+            password_string[character_place] = character;
+            character_place++;
+        }
+    }
 }
