@@ -3,7 +3,8 @@
 
 void remove_break(char string[100]);
 int str_len(const char string[]);
-int samestr(const char first_string[], const char second_string[]);
+int str_same(const char first_string[], const char second_string[]);
+const char *str_strip(const char string[], int start, int end);
 int *get_params(int argc, char const *argv[]);
 int check_level1(const char string[]);
 int check_level2(const char string[], const int PARAM);
@@ -41,7 +42,7 @@ int str_len(const char string[])
     return count;
 }
 
-int samestr(const char first_string[], const char second_string[])
+int str_same(const char first_string[], const char second_string[])
 {
     int are_same = 1;
     for (int i = 0; first_string[i] != '\0' && second_string[i] != '\0'; i++)
@@ -61,15 +62,15 @@ int *get_params(int argc, char const *argv[])
 
     for (int i = 1; i < argc; i++)
     {
-        if (samestr(argv[i], "-l") == 1)
+        if (str_same(argv[i], "-l") == 1)
         {
             output[0] = atoi(argv[i + 1]);
         }
-        else if (samestr(argv[i], "-p") == 1)
+        else if (str_same(argv[i], "-p") == 1)
         {
             output[1] = atoi(argv[i + 1]);
         }
-        else if (samestr(argv[i], "--stats") == 1)
+        else if (str_same(argv[i], "--stats") == 1)
         {
             output[2] = 1;
         }
@@ -178,7 +179,36 @@ int check_level3(const char string[], const int PARAM)
     }
     return biggest_count < PARAM ? 1 : 0;
 }
-int check_level4(const char string[], const int PARAM);
+int check_level4(const char string[], const int PARAM)
+{
+    char substring[100] = "";
+    char comparison_string[100] = "";
+    int is_ok = 1;
+    for (int i = 0; i < str_len(string); i++)
+    {
+        // construct substring
+        for (int j = 0; j < PARAM; j++)
+        {
+            substring[j] = string[i + j];
+        }
+        for (int k = 1; k < str_len(string); k++)
+        {
+            // construct comparison
+            for (int l = 0; l < PARAM; l++)
+            {
+                comparison_string[l] = string[i + k + l];
+            }
+            // printf("%s %s \n", substring, comparison_string);
+            if (str_same(substring, comparison_string) == 1)
+            {
+                printf("%s %s \n", substring, comparison_string);
+                is_ok = 0;
+                break;
+            }
+        }
+    }
+    return is_ok;
+}
 
 void process_checks(const int LEVEL, const int PARAM, const int STATS)
 {
@@ -206,6 +236,13 @@ void process_checks(const int LEVEL, const int PARAM, const int STATS)
         if (LEVEL >= 3)
         {
             if (check_level3(password_string, PARAM) != 1)
+            {
+                is_valid = 0;
+            }
+        }
+        if (LEVEL >= 4)
+        {
+            if (check_level4(password_string, PARAM) != 1)
             {
                 is_valid = 0;
             }
