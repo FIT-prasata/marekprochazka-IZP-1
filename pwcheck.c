@@ -1,33 +1,63 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// removes '\n' char from a string
 void remove_break(char string[102]);
+
+// returns length of string
 int str_len(const char string[]);
+
+// returns 1 if strings are same, else returns 0
 int str_same(const char first_string[], const char second_string[]);
+
+// retruns 1 if all chars in string can be converted to numbers otherwise returns 0
 int str_isnum(const char string[]);
-const char *str_strip(const char string[], int start, int end);
-int *get_params(int argc, char const *argv[]);
-int validate_input(const int LEVEL,const int PARAM, int argc, char const *argv[]);
+
+// returns 1 if chr is in string otherwise 0
+int str_in(const char string[], const char chr);
+
+// gets values of LEVEL, PARAM and STATS (contains bonus solution)
+int *get_values(int argc, char const *argv[]);
+
+// returns 1 if values of LEVEL, PARAM and STATS are OK otherwise 0
+int validate_input(const int LEVEL, const int PARAM, int argc, char const *argv[]);
+
+// evaluations of levels
 int check_level1(const char string[]);
 int check_level2(const char string[], const int PARAM);
 int check_level3(const char string[], const int PARAM);
 int check_level4(const char string[], const int PARAM);
+
+// prints statistics
+void print_stats();
+
+// updates stats
+void process_stats_on_string(const char string[]);
+
+// funciont that iterates through all passwords on stdin
 int process_checks(const int LEVEL, const int PARAM, const int STATS);
+
+// global variables for stats
+int nchars, npasswords, sumchars = 0;
+int min = 999;
+char used_chars[127];
 
 int main(int argc, char const *argv[])
 {
-    int *parametrs = get_params(argc, argv);
+    // set constants
+    int *parametrs = get_values(argc, argv);
     const int LEVEL = *parametrs;
     const int PARAM = *(parametrs + 1);
     const int STATS = *(parametrs + 2);
-    if (validate_input(LEVEL,PARAM, argc, argv) == 1)
+    // if constants and input are valid then start main programme
+    if (validate_input(LEVEL, PARAM, argc, argv) == 1)
     {
-        
         return process_checks(LEVEL, PARAM, STATS);
     }
     return 1;
 }
 
+// removes '\n' char from a string
 void remove_break(char string[102])
 {
     for (int i = 0; i < 102; i++)
@@ -39,6 +69,7 @@ void remove_break(char string[102])
     }
 }
 
+// returns length of string
 int str_len(const char string[])
 {
     int count = 0;
@@ -47,12 +78,11 @@ int str_len(const char string[])
     return count;
 }
 
+// returns 1 if strings are same, else returns 0
 int str_same(const char *first_string, const char *second_string)
 {
     int are_same = 1;
 
-    // Iterate a loop till the end
-    // of both the strings
     while (*first_string != '\0' || *second_string != '\0')
     {
         if (*first_string == *second_string)
@@ -61,8 +91,6 @@ int str_same(const char *first_string, const char *second_string)
             second_string++;
         }
 
-        // If two characters are not same
-        // print the difference and exit
         else if ((*first_string == '\0' && *second_string != '\0') || (*first_string != '\0' && *second_string == '\0') || *first_string != *second_string)
         {
             are_same = 0;
@@ -70,9 +98,10 @@ int str_same(const char *first_string, const char *second_string)
         }
     }
 
-    // If two strings are exactly same
     return are_same;
 }
+
+// retruns 1 if all chars in string can be converted to numbers otherwise returns 0
 int str_isnum(const char string[])
 {
     int is_num = 1;
@@ -86,7 +115,21 @@ int str_isnum(const char string[])
     return is_num;
 }
 
-int *get_params(int argc, char const *argv[])
+// returns 1 if chr is in string otherwise 0
+int str_in(const char string[], const char chr)
+{
+    for (int i = 0; i < str_len(string); i++)
+    {
+        if (string[i] == chr)
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// gets values of LEVEL, PARAM and STATS (contains bonus solution)
+int *get_values(int argc, char const *argv[])
 {
     static int output[3] = {0, 0, 0};
 
@@ -122,7 +165,8 @@ int *get_params(int argc, char const *argv[])
     return output;
 }
 
-int validate_input(const int LEVEL,const int PARAM, int argc, char const *argv[])
+// returns 1 if values of LEVEL, PARAM and STATS are OK otherwise 0
+int validate_input(const int LEVEL, const int PARAM, int argc, char const *argv[])
 {
     int validated = 1;
     int num_arg_count = 0;
@@ -131,7 +175,7 @@ int validate_input(const int LEVEL,const int PARAM, int argc, char const *argv[]
         validated = 0;
         fprintf(stderr, "Invalid LEVEL param '%d'\n", LEVEL);
     }
-        if (PARAM < 1)
+    if (PARAM < 1)
     {
         validated = 0;
         fprintf(stderr, "Invalid PARAM param '%d'\n", PARAM);
@@ -170,6 +214,8 @@ int validate_input(const int LEVEL,const int PARAM, int argc, char const *argv[]
     return validated;
 }
 
+// evaluations of levels
+
 int check_level1(const char string[])
 {
     int has_small_char = 0;
@@ -200,6 +246,7 @@ int check_level2(const char string[], const int PARAM)
     int has_number_char = 0;
     int has_special_char = 0;
     int count_groups = 0;
+    int min_groups = PARAM <= 4 ? PARAM : 4;
 
     for (int i = 0; i < str_len(string); i++)
     {
@@ -221,7 +268,7 @@ int check_level2(const char string[], const int PARAM)
             has_big_char = 1;
             continue;
         }
-        if (string[i] >= '0' && string[i] <= '9' && has_number_char == 0)
+        if (string[i] >= '0' && string[i] <= '9')
         {
             if (has_number_char != 1)
             {
@@ -236,7 +283,7 @@ int check_level2(const char string[], const int PARAM)
             has_special_char = 1;
         }
     }
-    return count_groups >= PARAM ? 1 : 0;
+    return count_groups >= min_groups ? 1 : 0;
 }
 int check_level3(const char string[], const int PARAM)
 {
@@ -294,15 +341,49 @@ int check_level4(const char string[], const int PARAM)
     return is_ok;
 }
 
+// prints statistics
+void print_stats()
+{
+    float avg = (float)sumchars / (float)npasswords;
+    printf("Statistika:\n");
+    printf("Ruznych znaku: %d\n", nchars);
+    printf("Minimalni delka: %d\n", min);
+    printf("Prumerna delka: %.1f\n", avg);
+}
+
+// updates stats
+void process_stats_on_string(const char string[])
+{
+    int length = str_len(string);
+
+    for (int i = 0; i < length; i++)
+    {
+        if (str_in(used_chars, string[i]) == 0)
+        {
+            used_chars[str_len(used_chars)] = string[i];
+            nchars++;
+        }
+    }
+    if (length < min)
+    {
+        min = length;
+    }
+    sumchars += length;
+    npasswords++;
+}
+
+// funciont that iterates through all passwords on stdin
 int process_checks(const int LEVEL, const int PARAM, const int STATS)
 {
     char password_string[102];
     int is_valid = 1;
     int count = 0;
     int is_error = 0;
+
     while (fgets(password_string, 102, stdin))
     {
-        if (password_string[str_len(password_string)-1] != '\n') {
+        if (password_string[str_len(password_string) - 1] != '\n')
+        {
             fprintf(stderr, "Too big bro");
             is_error = 1;
             break;
@@ -337,12 +418,20 @@ int process_checks(const int LEVEL, const int PARAM, const int STATS)
                 is_valid = 0;
             }
         }
+        if (STATS == 1)
+        {
+            process_stats_on_string(password_string);
+        }
 
         if (is_valid == 1)
         {
             printf("%s\n", password_string);
         }
         count++;
+    }
+    if (is_error == 0 && STATS == 1)
+    {
+        print_stats();
     }
     return is_error;
 }
