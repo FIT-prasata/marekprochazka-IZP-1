@@ -132,16 +132,17 @@ int str_in(const char string[], const char chr)
 int *get_values(int argc, char const *argv[])
 {
     static int output[3] = {0, 0, 0};
-
+    char *garbage;
+ 
     for (int i = 1; i < argc; i++)
     {
         if (str_same(argv[i], "-l") == 1)
         {
-            output[0] = atoi(argv[i + 1]);
+            output[0] = strtol(argv[i + 1], &garbage, 20);
         }
         else if (str_same(argv[i], "-p") == 1)
         {
-            output[1] = atoi(argv[i + 1]);
+            output[1] = strtol(argv[i + 1], &garbage, 20);
         }
         else if (str_same(argv[i], "--stats") == 1)
         {
@@ -158,8 +159,8 @@ int *get_values(int argc, char const *argv[])
     }
     else if (output[0] == 0 && output[1] == 0)
     {
-        output[0] = atoi(argv[1]);
-        output[1] = atoi(argv[2]);
+        output[0] = strtol(argv[1], &garbage, 20);
+        output[1] = strtol(argv[2], &garbage, 20);
     }
 
     return output;
@@ -384,7 +385,7 @@ int process_checks(const int LEVEL, const int PARAM, const int STATS)
     {
         if (password_string[str_len(password_string) - 1] != '\n')
         {
-            fprintf(stderr, "Too big bro");
+            fprintf(stderr, "Invalid input");
             is_error = 1;
             break;
         }
