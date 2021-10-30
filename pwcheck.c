@@ -1,3 +1,4 @@
+//https://github.com/marekprochazka/IZP-projekt-1
 #include <stdio.h>
 #include <stdlib.h>
 
