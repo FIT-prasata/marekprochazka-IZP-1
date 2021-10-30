@@ -8,7 +8,7 @@ void remove_break(char string[102]);
 int str_len(const char string[]);
 
 // returns 1 if strings are same, else returns 0
-int str_same(const char first_string[], const char second_string[]);
+int str_same(const char *first_string, const char *second_string);
 
 // retruns 1 if all chars in string can be converted to numbers otherwise returns 0
 int str_isnum(const char string[]);
