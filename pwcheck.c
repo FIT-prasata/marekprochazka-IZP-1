@@ -138,11 +138,11 @@ int *get_values(int argc, char const *argv[])
     {
         if (str_same(argv[i], "-l") == 1)
         {
-            output[0] = strtol(argv[i + 1], &garbage, 20);
+            output[0] = strtol(argv[i + 1], &garbage, 10);
         }
         else if (str_same(argv[i], "-p") == 1)
         {
-            output[1] = strtol(argv[i + 1], &garbage, 20);
+            output[1] = strtol(argv[i + 1], &garbage, 10);
         }
         else if (str_same(argv[i], "--stats") == 1)
         {
@@ -159,8 +159,8 @@ int *get_values(int argc, char const *argv[])
     }
     else if (output[0] == 0 && output[1] == 0)
     {
-        output[0] = strtol(argv[1], &garbage, 20);
-        output[1] = strtol(argv[2], &garbage, 20);
+        output[0] = strtol(argv[1], &garbage, 10);
+        output[1] = strtol(argv[2], &garbage, 10);
     }
 
     return output;
